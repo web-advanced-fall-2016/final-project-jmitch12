@@ -9,48 +9,62 @@ var cellSize = 50;
 var canvasWidth = 900;
 var canvasHeight = 500;
 
+//PLAYER HAS WON
+var playerWon = false;
+
 //PIPES 2D ARRAY
 var pipes;
 
 //OBSTACLES 2D ARRAY
 var obstacles;
 
-//LIST OF OBSTACLE LOCATION
-var obstaclesList = [{x:0, y:1}, {x:1, y:1}, {x:2, y:1}, 
-                {x:0, y:2}, {x:1, y:2}, {x:2, y:2}, 
-                {x:0, y:3}, {x:1, y:3}, {x:2, y:3},
-                {x:9, y:0}, {x:9, y:1}, {x:9, y:2}, {x:9, y:3},
-                {x:10, y:0}, {x:10, y:1}, {x:10, y:2}, {x:10, y:3}, 
-                {x:11, y:0}, {x:11, y:1}, {x:11, y:2}, {x:11, y:3},
-                {x:1, y:7}, {x:2, y:7}, {x:3, y:7},
-                {x:1, y:8}, {x:2, y:8}, {x:3, y:8},
-                {x:1, y:9}, {x:2, y:9}, {x:3, y:9}];
+var obstaclesList;
 
-//ARRAY OF MOVES 
-var playerMoves = [{ x: 3, y: 1 }];
+var playerMoves = [];
 
-//POSITION OF DESTINATION/FINAL PIPE
-var endX = cellSize * 16;
-var endY = cellSize * 8;
+var endX, endY, startX, startY, destinationX, destinationY;
 
-//STARTING PIPE POSITION
-var startX = 0;
-var startY = cellSize;
+var obstaclesInfo = [];
 
-//OBSTACLE POSITIONS
-var rootX = 450;
-var rootY = 0;
-var gasX = 50;
-var gasY = 350;
+var pipesRemaining;
 
-//Number of pipes left
-var pipesRemaining = 50;
+$.getJSON("mapInfo.json", function(data) {
+    console.log("hello");
+    console.log(data);
+
+    obstaclesList = data.obstaclesList;
+
+    //ARRAY OF MOVES 
+    playerMoves = data.playerMoves;
+
+    //POSITION OF DESTINATION/FINAL PIPE
+    endX = data.end.x * cellSize;
+    endY = data.end.y * cellSize;
+
+    //STARTING PIPE POSITION
+
+    startX = data.start.x * cellSize;
+    startY = data.start.y * cellSize;
+
+    //OBSTACLES
+
+    obstaclesInfo = data.obstaclesInfo;
+
+    //Number of pipes left
+    pipesRemaining = data.pipesRemaining;
+
+    //FINAL PLAYER ENDPOINT
+    destinationX = data.destination.x;
+    destinationY = data.destination.y;
+
+});
+
 
 //BASE TEXT SIZE
 var fontSize = 14;
 
 //IMAGE VARIABLES
-var bg, firstPipe, user, endPipe, gameOver, winner, roots, gas, crack;
+var bg, firstPipe, user, endPipe, gameOver, winner, crack;
 
 /*=======LOAD SOUNDS=======*/
 //UNCOMMENT TO PLAY SOUNDS
@@ -71,9 +85,11 @@ function preload() {
     endPipe = loadImage("assets/end.png");
     gameOver = loadImage("assets/loser.png");
     winner = loadImage("assets/winnerTwo.png");
-    roots = loadImage("assets/root.png");
-    gas = loadImage("assets/gas.png");
     crack = loadImage("assets/crack.png")
+
+    for (i = 0; i < obstaclesInfo.length; i++) {
+        obstaclesInfo[i]["img"] = loadImage(obstaclesInfo[i].artwork)
+    }
 }
 
 function setup() {
@@ -109,130 +125,124 @@ function setup() {
 
 function draw() {
 
-    /*=========START + END==========*/
-    background(bg);
-    image(firstPipe, startX, startY, cellSize * 3, cellSize * 3);
-    image(endPipe, endX, endY, cellSize, cellSize * 2);
-    image(roots, rootX, rootY, cellSize * 3, cellSize * 4);
-    image(gas, gasX, gasY, cellSize * 3, cellSize * 3);
+    if (!playerWon) {
+        /*=========START + END==========*/
+        background(bg);
+        image(firstPipe, startX, startY, cellSize * 3, cellSize * 3);
+        image(endPipe, endX, endY, cellSize, cellSize * 2);
 
-    /*=========CREATE PIPES 2D ARRAY============*/
-    for (var i = 0; i < COLUMNS; i++) {
-        for (var j = 0; j < ROWS; j++) {
+        //OBSTACLE POSITIONS
+        for (var i = 0; i < obstaclesInfo.length; i++) {
+            image(obstaclesInfo[i].img,
+                obstaclesInfo[i].coordinates.x * cellSize,
+                obstaclesInfo[i].coordinates.y * cellSize,
+                obstaclesInfo[i].imageSize.w * cellSize,
+                obstaclesInfo[i].imageSize.h * cellSize);
+        }
+
+        /*=========CREATE PIPES 2D ARRAY============*/
+        for (var i = 0; i < COLUMNS; i++) {
+            for (var j = 0; j < ROWS; j++) {
 
 
-            if (i === getPlayerPosition().x &&
-                j === getPlayerPosition().y) {
-                //DRAW THE PLAYER
-                // fill('#E8D738');
-                image(user, i * cellSize, j * cellSize, cellSize, cellSize);
-            } else if (pipes[i][j] == "empty") {
-                noFill();
-                rect(i * cellSize, j * cellSize, cellSize, cellSize);
+                if (i === getPlayerPosition().x &&
+                    j === getPlayerPosition().y) {
+                    //DRAW THE PLAYER
+                    // fill('#E8D738');
+                    image(user, i * cellSize, j * cellSize, cellSize, cellSize);
+                } else if (pipes[i][j] == "empty") {
+                    noFill();
+                    rect(i * cellSize, j * cellSize, cellSize, cellSize);
 
-            } else if (pipes[i][j] == "pipe") {
-                fill('#58595b');
-                rect(i * cellSize, j * cellSize, cellSize, cellSize);
+                } else if (pipes[i][j] == "pipe") {
+                    fill('#58595b');
+                    rect(i * cellSize, j * cellSize, cellSize, cellSize);
+                }
+
             }
+        }
 
+        /*=========DISPLAY PIPES REMAINING===========*/
+        fill(255);
+        textAlign(CENTER);
+        textFont('Quattrocento');
+        textSize(fontSize);
+        text("PIPES", 67, 66);
+
+        //NUMBER OF PIPES REMAINING
+        textFont('Oswald-Heavy');
+        textSize(fontSize + 10);
+        text(pipesRemaining, 67, 93);
+
+        //TIMER
+        fill("#414042");
+        text("NO", 67, 155);
+        textSize(fontSize);
+        text("PRESSURE", 67, 170);
+
+        // /*=========TIMER SETUP===========*/
+        //    var t = interval-int(millis()/1000);
+        //    time = nf(t , 3);
+
+        //    if (t > 10){
+        //        fill("#414042");
+        //        text(time, 67, 166);
+        //    } 
+
+        //    //IN DANGER OF RUNNING OUT OF TIME
+        //    if(t <= 10) {
+        //        fill("#92002d")
+        //        text(time, 67, 166);
+        //    } 
+
+        //    //OUT OF TIME
+        //    if(t <= 0) {
+        //        noFill();
+        //        image(gameOver, 0, 0, 750, 500);
+        //        if (mouseIsPressed){
+        //            console.log("PRESS")
+        //            var t = interval-int(millis()/1000);
+        //            time = nf(t , 3);
+        //            reset();
+        //        };
+        //    } 
+
+        if (pipesRemaining <= 0) {
+            /*=======YOU LOSE=======*/
+
+            //UNCOMMENT TO PLAY LOSING NOISES 
+            // track.pause();
+            // scream.play();
+
+            image(gameOver, 0, 0, canvasWidth, canvasHeight);
+            if (mouseIsPressed) {
+                // scream.pause();
+                reset();
+            }
+        }
+
+        /*=========PLAYER REACHES END PIPE = WINNER=================*/
+        if (getPlayerPosition().x == destinationX && getPlayerPosition().y == destinationY) {
+            //YOU WIN
+            // track.pause();
+            // water.play();
+            console.log("WINNER");
+            image(winner, 0, 0, canvasWidth, canvasHeight);
+            var levelButton = document.createElement('button');
+            levelButton.innerHTML = "Next Level"
+            levelButton.classList.add = "next";
+
+            var canvasPage = document.getElementById('game');
+            canvasPage.appendChild(levelButton);
+
+            levelButton.addEventListener("click", function() {
+                levelButton.style.display = 'none';
+                reset();
+            });
+            playerWon = true;
         }
     }
 
-    /*=========DISPLAY PIPES REMAINING===========*/
-    fill(255);
-    textAlign(CENTER);
-    textFont('Quattrocento');
-    textSize(fontSize);
-    text("PIPES", 67, 66);
-
-    //NUMBER OF PIPES REMAINING
-    textFont('Oswald-Heavy');
-    textSize(fontSize + 10);
-    text(pipesRemaining, 67, 93);
-
-    //TIMER
-    fill("#414042");
-    text("NO", 67, 155);
-    textSize(fontSize);
-    text("PRESSURE", 67, 170);
-
-    // /*=========TIMER SETUP===========*/
-    //    var t = interval-int(millis()/1000);
-    //    time = nf(t , 3);
-
-    //    if (t > 10){
-    //        fill("#414042");
-    //        text(time, 67, 166);
-    //    } 
-
-    //    //IN DANGER OF RUNNING OUT OF TIME
-    //    if(t <= 10) {
-    //        fill("#92002d")
-    //        text(time, 67, 166);
-    //    } 
-
-    //    //OUT OF TIME
-    //    if(t <= 0) {
-    //        noFill();
-    //        image(gameOver, 0, 0, 750, 500);
-    //        if (mouseIsPressed){
-    //            console.log("PRESS")
-    //            var t = interval-int(millis()/1000);
-    //            time = nf(t , 3);
-    //            reset();
-    //        };
-    //    } 
-
-    if (pipesRemaining <= 0) {
-        /*=======YOU LOSE=======*/
-
-        //UNCOMMENT TO PLAY LOSING NOISES 
-        // track.pause();
-        // scream.play();
-
-        image(gameOver, 0, 0, canvasWidth, canvasHeight);
-        if (mouseIsPressed) {
-            // scream.pause();
-            reset();
-        }
-    }
-
-    /*=========PLAYER REACHES END PIPE = WINNER=================*/
-    // if (getPlayerPosition().x == 13 && getPlayerPosition().y == 8) {
-    //     //YOU WIN
-    //     // track.pause();
-    //     // water.play();
-    //     image(winner, 0, 0, canvasWidth, canvasHeight);
-    //     var levelButton = document.createElement('button');
-    //     levelButton.innerHTML = "Next Level"
-    //     levelButton.classList.add = "next";
-
-    //     var canvasPage = document.getElementById('game');
-    //     canvasPage.appendChild(levelButton);
-
-
-
-    //     levelButton.addEventListener("click", function() {
-    //         levelButton.style.display = 'none';
-    //         reset();
-    //     });
-
-    // }
-
-    /*=========PLAYER COLLIDES WITH OBSTACLES=========*/
-
-    if (getPlayerPosition().x == 9 && getPlayerPosition().y == 0 || getPlayerPosition().x == 9 && getPlayerPosition().y == 1 || getPlayerPosition().x == 9 && getPlayerPosition().y == 0 || getPlayerPosition().x == 9 && getPlayerPosition().y == 2 || getPlayerPosition().x == 9 && getPlayerPosition().y == 3) {
-        console.log(getPlayerPosition());
-        image(crack, width / 6, 0, cellSize * 10, height);
-    }
-    if (getPlayerPosition().x == 3 && getPlayerPosition().y == 7 || getPlayerPosition().x == 2 && getPlayerPosition().y == 7 || getPlayerPosition().x == 1 && getPlayerPosition().y == 7 || getPlayerPosition().x == 3 && getPlayerPosition().y == 8 || getPlayerPosition().x == 3 && getPlayerPosition().y == 9 || getPlayerPosition().x == 1 && getPlayerPosition().y == 8 || getPlayerPosition().x == 1 && getPlayerPosition().y == 9) {
-        console.log(getPlayerPosition());
-        image(crack, width / 6, 0, cellSize * 10, height);
-    }
-    if (getPlayerPosition().x == 2 && getPlayerPosition().y == 1 || getPlayerPosition().x == 2 && getPlayerPosition().y == 2 || getPlayerPosition().x == 2 && getPlayerPosition().y == 3) {
-        console.log(getPlayerPosition());
-        image(crack, width / 6, 0, cellSize * 10, height);
-    }
 
 }
 
@@ -371,17 +381,17 @@ function detectCollisions(keyCode) {
 
     if (keyCode == UP_ARROW) {
         console.log("up");
-        wherePlayerWantsGo = {x: playerPos.x, y: playerPos.y - 1};
+        wherePlayerWantsGo = { x: playerPos.x, y: playerPos.y - 1 };
         console.log(wherePlayerWantsGo);
-    } else if (keyCode == DOWN_ARROW){
+    } else if (keyCode == DOWN_ARROW) {
         console.log("down");
-        wherePlayerWantsGo = {x: playerPos.x, y: playerPos.y + 1};
-    } else if (keyCode == RIGHT_ARROW){
+        wherePlayerWantsGo = { x: playerPos.x, y: playerPos.y + 1 };
+    } else if (keyCode == RIGHT_ARROW) {
         console.log("right");
-        wherePlayerWantsGo = {x: playerPos.x +1, y: playerPos.y};
-    } else if (keyCode == LEFT_ARROW){
+        wherePlayerWantsGo = { x: playerPos.x + 1, y: playerPos.y };
+    } else if (keyCode == LEFT_ARROW) {
         console.log("left");
-        wherePlayerWantsGo = {x: playerPos.x -1, y: playerPos.y};
+        wherePlayerWantsGo = { x: playerPos.x - 1, y: playerPos.y };
     } else {
         console.log(wherePlayerWantsGo);
     }
@@ -401,7 +411,7 @@ function detectCollisions(keyCode) {
     if (pipes[wherePlayerWantsGo.x][wherePlayerWantsGo.y] == "pipe") {
         console.log("boom");
         return true;
-    } 
+    }
 
     //DETECT OBSTACLES
 
@@ -420,7 +430,9 @@ function reset() {
 
     playerMoves = [{ x: 3, y: 1 }];
     pipesRemaining = 20;
-    interval = 20;
+    // interval = 20;
+
+    playerWon = false;
 
     //UNCOMMENT TO RESET SOUNDTRACK
     // track.play();
