@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css?family=Oswald:300,400,700|Quattrocento:400,700');
+
+$water-color : #84b8e3;
+$white : #e6e7e8;
+$title-font : 'Oswald', sans-serif;
+$paragraph : 'Quattrocento', serif;
+
+header {
+    position: absolute;
+    top: 0;
+    width: 100vw;
+    height: 100px;
+    z-index: 5;
+}
+
+/*header nav{
+        float: right;
+        
+        margin: 35px 45px;
+    }
+
+header nav a {
+            color: white;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1em;
+            margin-left: 20px;
+        }
+
+header nav a:hover {
+    color: teal;
+}*/
+
+#logo {
+    position: relative;
+    top: 25px;
+    left: 45px;
+    float: left;
+    width: 125px;
+    height: 50px;
+    background-color: teal;
+    opacity: .8;
+}
+
+#logo h1 {
+        font-family: $title-font;
+        color: aquamarine;
+        font-size: 1.5em;
+        text-align: center;
+        text-transform: uppercase;
+        padding-top: 12px;
+    }
+
+#logo a {
+  text-decoration: none;
+}
+
+#game {
+  position: relative;
+  background-color: rgba(65,64,66, .8);
+  width: 900px;
+  height: 500px;
+  margin-left: 45px;
+  padding: 10px;
+}
+
+.next{
+	color:white;
+	background-color: $white;
+}
+
+.next:hover{
+	background-color: $water-color;
+}
+
