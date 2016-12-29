@@ -13,12 +13,14 @@ var canvasHeight = 500;
 var playerWon = false;
 
 //PIPES 2D ARRAY
-var pipes;
+var pipes = [];
 
 //OBSTACLES 2D ARRAY
-var obstacles;
+var obstacles = [];
 
 var obstaclesList;
+
+var levelName;
 
 var playerMoves = [];
 
@@ -28,36 +30,12 @@ var obstaclesInfo = [];
 
 var pipesRemaining;
 
-$.getJSON("mapInfo.json", function(data) {
-    console.log("hello");
-    console.log(data);
+var currentLevel = 0;
 
-    obstaclesList = data.obstaclesList;
+var dynamicItems = [];
 
-    //ARRAY OF MOVES 
-    playerMoves = data.playerMoves;
-
-    //POSITION OF DESTINATION/FINAL PIPE
-    endX = data.end.x * cellSize;
-    endY = data.end.y * cellSize;
-
-    //STARTING PIPE POSITION
-
-    startX = data.start.x * cellSize;
-    startY = data.start.y * cellSize;
-
-    //OBSTACLES
-
-    obstaclesInfo = data.obstaclesInfo;
-
-    //Number of pipes left
-    pipesRemaining = data.pipesRemaining;
-
-    //FINAL PLAYER ENDPOINT
-    destinationX = data.destination.x;
-    destinationY = data.destination.y;
-
-});
+//ARRAY OF LEVELS
+var levelFiles = ["mapInfo.json", "levelTwo.json"];
 
 
 //BASE TEXT SIZE
@@ -77,55 +55,94 @@ var bg, firstPipe, user, endPipe, gameOver, winner, crack;
 //TIMER VARIABLE
 var interval = 20;
 
-function preload() {
-    /*=======LOAD IMAGES=======*/
-    bg = loadImage("assets/background.png");
-    firstPipe = loadImage("assets/begin.png");
-    user = loadImage("assets/user.png");
-    endPipe = loadImage("assets/end.png");
-    gameOver = loadImage("assets/loser.png");
-    winner = loadImage("assets/winnerTwo.png");
-    crack = loadImage("assets/crack.png")
+var mapReady = false;
 
-    for (i = 0; i < obstaclesInfo.length; i++) {
-        obstaclesInfo[i]["img"] = loadImage(obstaclesInfo[i].artwork)
-    }
+function loadLevel(mapInfoFile) {
+    mapReady = false;
+    playerWon = false;
+
+    setup();
+
+    /*======CONNECT TO JSON FILE=======*/
+    $.getJSON(mapInfoFile, function(data) {
+
+        //OBSTACLE POSITIONS
+        obstaclesList = data.obstaclesList;
+
+        //ARRAY OF MOVES 
+        playerMoves = data.playerMoves;
+
+        //POSITION OF DESTINATION/FINAL PIPE
+        endX = data.end.x * cellSize;
+        endY = data.end.y * cellSize;
+
+        //STARTING PIPE POSITION
+        startX = data.start.x * cellSize;
+        startY = data.start.y * cellSize;
+
+        //INFORMATION FOR ALL DIFFERENT OBSTACLES
+        obstaclesInfo = data.obstaclesInfo;
+
+        //Number of pipes left
+        pipesRemaining = data.pipesRemaining;
+
+        //FINAL PLAYER ENDPOINT
+        destinationX = data.destination.x;
+        destinationY = data.destination.y;
+
+        /*=======LOAD IMAGES=======*/
+        bg = loadImage("assets/background.png");
+        firstPipe = loadImage("assets/begin.png");
+        user = loadImage("assets/user.png");
+        endPipe = loadImage("assets/end.png");
+        gameOver = loadImage("assets/loser.png");
+        winner = loadImage("assets/winnerTwo.png");
+        crack = loadImage("assets/crack.png")
+
+        for (i = 0; i < obstaclesInfo.length; i++) {
+            obstaclesInfo[i]["img"] = loadImage(obstaclesInfo[i].artwork)
+        }
+
+        //UNCOMMENT FOR BACKGROUND SOUNDTRACK
+        // track.play();
+
+        for (var i = 0; i < COLUMNS; i++) {
+            pipes[i] = [];
+            obstacles[i] = [];
+            for (var j = 0; j < ROWS; j++) {
+                pipes[i][j] = "empty";
+                obstacles[i][j] = "empty";
+            }
+        }
+
+        //STORING OBSTACLES INTO OBSTACLE ARRAY
+
+        for (var i = 0; i < obstaclesList.length; i++) {
+            obstacles[obstaclesList[i].x][obstaclesList[i].y] = "occupied";
+        }
+
+        mapReady = true;
+
+    });
+}
+
+function preload() {
+    loadLevel(levelFiles[0]);
+
 }
 
 function setup() {
 
+
     var canvas = createCanvas(canvasWidth, canvasHeight);
     canvas.parent('game');
 
-    //UNCOMMENT FOR BACKGROUND SOUNDTRACK
-    // track.play();
-
     noStroke();
-    pipes = [];
-    obstacles = [];
-
-    for (var i = 0; i < COLUMNS; i++) {
-        pipes[i] = [];
-        obstacles[i] = [];
-        for (var j = 0; j < ROWS; j++) {
-            pipes[i][j] = "empty";
-            obstacles[i][j] = "empty";
-        }
-    }
-
-    //STORING OBSTACLES INTO OBSTACLE ARRAY
-
-    for (var i = 0; i < obstaclesList.length; i++) {
-        obstacles[obstaclesList[i].x][obstaclesList[i].y] = "occupied";
-    }
-
-    // console.log(obstacles);
-
 }
 
 function draw() {
 
-    if (!playerWon) {
+    if (!playerWon && mapReady) {
         /*=========START + END==========*/
         background(bg);
         image(firstPipe, startX, startY, cellSize * 3, cellSize * 3);
@@ -139,6 +156,7 @@ function draw() {
                 obstaclesInfo[i].imageSize.w * cellSize,
                 obstaclesInfo[i].imageSize.h * cellSize);
         }
+
 
         /*=========CREATE PIPES 2D ARRAY============*/
         for (var i = 0; i < COLUMNS; i++) {
@@ -200,12 +218,31 @@ function draw() {
         //        noFill();
         //        image(gameOver, 0, 0, 750, 500);
         //        if (mouseIsPressed){
-        //            console.log("PRESS")
+        //           // console.log("PRESS")
         //            var t = interval-int(millis()/1000);
         //            time = nf(t , 3);
         //            reset();
         //        };
         //    } 
+
+         //DYNAMIC ITEMS (effects, juice, etc.)
+        var keepItems = [];
+
+        for (var i = 0; i < dynamicItems.length; i++) {
+            if (dynamicItems[i].lifeTime > 0){
+                image(dynamicItems[i].img, 
+                dynamicItems[i].x, 
+                dynamicItems[i].y, 
+                dynamicItems[i].w,
+                dynamicItems[i].h);
+
+                dynamicItems[i].lifeTime --;
+
+                keepItems.push(dynamicItems[i]);
+            } 
+        }
+
+        dynamicItems = keepItems;
 
         if (pipesRemaining <= 0) {
             /*=======YOU LOSE=======*/
@@ -226,7 +263,6 @@ function draw() {
             //YOU WIN
             // track.pause();
             // water.play();
-            console.log("WINNER");
             image(winner, 0, 0, canvasWidth, canvasHeight);
             var levelButton = document.createElement('button');
             levelButton.innerHTML = "Next Level"
@@ -235,11 +271,13 @@ function draw() {
             var canvasPage = document.getElementById('game');
             canvasPage.appendChild(levelButton);
 
+            playerWon = true;
+
             levelButton.addEventListener("click", function() {
                 levelButton.style.display = 'none';
-                reset();
+                nextLevel();
             });
-            playerWon = true;
+
         }
     }
 
@@ -269,7 +307,7 @@ function keyPressed() {
             if (getPlayerPosition().y > 0) {
                 let nextPos = { x: getPlayerPosition().x, y: getPlayerPosition().y - 1 };
                 if (playerMoves.length > 1 && undoMove(nextPos)) {
-                    console.log('undo');
+
                     if (pipes[getPlayerPosition().x][getPlayerPosition().y] == "pipe") {
 
                         //DELETE THE PREVIOUS PIPE
@@ -290,7 +328,7 @@ function keyPressed() {
             if (getPlayerPosition().y < ROWS - 1) {
                 let nextPos = { x: getPlayerPosition().x, y: getPlayerPosition().y + 1 };
                 if (playerMoves.length > 1 && undoMove(nextPos)) {
-                    console.log('undo');
+
                     if (pipes[getPlayerPosition().x][getPlayerPosition().y] == "pipe") {
 
                         //DELETE THE PREVIOUS PIPE
@@ -331,7 +369,7 @@ function keyPressed() {
             if (getPlayerPosition().x < COLUMNS - 1) {
                 let nextPos = { x: getPlayerPosition().x + 1, y: getPlayerPosition().y };
                 if (playerMoves.length > 1 && undoMove(nextPos)) {
-                    console.log('undo');
+
                     if (pipes[getPlayerPosition().x][getPlayerPosition().y] == "pipe") {
 
                         //DELETE THE PREVIOUS PIPE
@@ -347,8 +385,12 @@ function keyPressed() {
                     pipesRemaining--;
                 }
             }
-        }
+        } 
 
+    } else {
+            console.log("Boom");
+            dynamicItems.push({ img : crack, x : getPlayerPosition().x * cellSize, 
+                                        y : getPlayerPosition().y * cellSize, w : cellSize * 2, h : cellSize * 2, lifeTime : 100});
     }
     /* switch(keyCode) {
          case UP_ARROW:
@@ -380,43 +422,38 @@ function detectCollisions(keyCode) {
     var wherePlayerWantsGo = null;
 
     if (keyCode == UP_ARROW) {
-        console.log("up");
+
         wherePlayerWantsGo = { x: playerPos.x, y: playerPos.y - 1 };
-        console.log(wherePlayerWantsGo);
+
     } else if (keyCode == DOWN_ARROW) {
-        console.log("down");
+
         wherePlayerWantsGo = { x: playerPos.x, y: playerPos.y + 1 };
     } else if (keyCode == RIGHT_ARROW) {
-        console.log("right");
+
         wherePlayerWantsGo = { x: playerPos.x + 1, y: playerPos.y };
     } else if (keyCode == LEFT_ARROW) {
-        console.log("left");
+
         wherePlayerWantsGo = { x: playerPos.x - 1, y: playerPos.y };
     } else {
-        console.log(wherePlayerWantsGo);
+        return false;
     }
-
-    console.log(lastPos);
 
     //Allows player to go backwards to delete previous pipe
     if (lastPos == null) {
         return false;
     } else if (wherePlayerWantsGo.x == lastPos.x && wherePlayerWantsGo.y == lastPos.y) {
-        console.log("delete");
         return false;
     }
 
     // DETECT PIPES IN THE WAY OF WHERE THE PLAYER WANTS TO GO
 
     if (pipes[wherePlayerWantsGo.x][wherePlayerWantsGo.y] == "pipe") {
-        console.log("boom");
         return true;
     }
 
     //DETECT OBSTACLES
 
     if (obstacles[wherePlayerWantsGo.x][wherePlayerWantsGo.y] == "occupied") {
-        console.log('BOOM');
         return true;
     }
 
@@ -426,22 +463,15 @@ function detectCollisions(keyCode) {
 /*=======RESET CURRENT LEVEL========*/
 
 function reset() {
+    loadLevel(levelFiles[currentLevel]);
 
+}
 
-    playerMoves = [{ x: 3, y: 1 }];
-    pipesRemaining = 20;
-    // interval = 20;
-
-    playerWon = false;
-
-    //UNCOMMENT TO RESET SOUNDTRACK
-    // track.play();
-
-    for (var i = 0; i < COLUMNS; i++) {
-        pipes[i] = [];
-        for (var j = 0; j < ROWS; j++) {
-            pipes[i][j] = "empty";
-        }
+function nextLevel() {
+    currentLevel++;
+    if (currentLevel >= levelFiles.length) {
+        console.log("YOU A WINNER HA-HA-HA")
+    } else {
+        loadLevel(levelFiles[currentLevel]);
     }
-
 }

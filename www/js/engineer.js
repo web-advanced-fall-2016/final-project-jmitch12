@@ -4,7 +4,7 @@ $(document).ready(function() {
         //Navigation
         menu: '#menu',
         lockAnchors: false,
-        anchors:['Play', 'Learn', 'Teach'],
+        anchors:['play', 'learn', 'share'],
         navigation: false,
         navigationPosition: 'right',
         navigationTooltips: ['firstSlide', 'secondSlide'],
@@ -43,12 +43,12 @@ $(document).ready(function() {
         //Accessibility
         keyboardScrolling: false,
         animateAnchor: true,
-        recordHistory: true,
+        recordHistory: false,
 
         //Design
         controlArrows: true,
         verticalCentered: true,
-        sectionsColor : ['#e6e7e8'],
+        sectionsColor : ['#4C4B55', '#4C4B55','#4C4B55'],
         paddingTop: '3em',
         paddingBottom: '10px',
         fixedElements: '#header, .footer',

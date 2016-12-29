@@ -1,61 +1,78 @@
 @import url("https://fonts.googleapis.com/css?family=Oswald:300,400,700|Quattrocento:400,700");
+@import url("https://fonts.googleapis.com/css?family=Oswald:300,400,700|Quattrocento:400,700");
+header .accordion > .accordion-item {
+  cursor: pointer; }
+
+header .accordion-item > .item-content {
+  overflow: hidden;
+  display: none;
+  padding-left: .5em; }
+
+header .item-content a {
+  color: white;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-family: "Oswald", sans-serif;
+  font-size: 1em;
+  padding: .1em; }
+
+header .item-content a:hover {
+  color: #88B04B; }
+
+header .accordion-item.open > .item-content {
+  overflow: hidden;
+  display: block; }
+
+header .accordion-item > .item-title {
+  color: #DFDFE3;
+  font-family: "Oswald", sans-serif;
+  font-size: 1em; }
+
+header .accordion-item > .item-title:hover {
+  color: #88B04B; }
+
 header {
   position: absolute;
   top: 0;
   width: 100vw;
   height: 100px;
   z-index: 5; }
-
-/*header nav{
-        float: right;
-        
-        margin: 35px 45px;
-    }
-
-header nav a {
-            color: white;
-            text-decoration: none;
-            text-transform: uppercase;
-            font-family: 'Oswald', sans-serif;
-            font-size: 1em;
-            margin-left: 20px;
-        }
+  header nav {
+    float: right;
+    margin: 35px 45px; }
+    header nav .menu-item {
+      display: inline-block; }
+      header nav .menu-item a {
+        color: #DFDFE3;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-family: "Oswald", sans-serif;
+        font-size: 1em; }
 
 header nav a:hover {
-    color: teal;
-}*/
+  color: #88B04B; }
+
 #logo {
   position: relative;
   top: 25px;
   left: 45px;
   float: left;
-  width: 125px;
-  height: 50px;
-  background-color: teal;
-  opacity: .8; }
-
-#logo h1 {
-  font-family: "Oswald", sans-serif;
-  color: aquamarine;
-  font-size: 1.5em;
-  text-align: center;
-  text-transform: uppercase;
-  padding-top: 12px; }
-
-#logo a {
-  text-decoration: none; }
+  width: 125px; }
+  #logo img {
+    height: 55px; }
 
 #game {
   position: relative;
-  background-color: rgba(65, 64, 66, 0.8);
+  background-color: #DFDFE3;
   width: 900px;
   height: 500px;
+  top: 10px;
   margin-left: 45px;
   padding: 10px; }
 
 .next {
-  color: white;
-  background-color: #e6e7e8; }
+  color: #4C4B55;
+  background-color: #DFDFE3; }
 
 .next:hover {
   background-color: #84b8e3; }

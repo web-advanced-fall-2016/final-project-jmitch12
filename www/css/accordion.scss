@@ -1,0 +1,59 @@
+@import 'variables';
+
+header .accordion {
+    // display: flex;
+    // flex-flow: column nowrap;
+    // position: absolute;
+    // padding: 1.5em 1em 1em 1.5em;
+    // z-index: 30;
+    // right: 2vw;
+    // top: .5vw;
+    // line-height: 30px;
+}
+
+header .accordion>.accordion-item {
+    // flex: 0 1 auto;
+    // display: flex;
+    // flex-flow: column nowrap;
+    // right:4vw;
+    // top: 4vh;
+    cursor: pointer;
+
+}
+
+header .accordion-item>.item-content {
+    overflow: hidden;
+    display: none;
+    padding-left: .5em;
+}
+
+header .item-content a{
+    color: white;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-family: $title-font;
+    font-size: $menu-size;
+    padding: .1em;
+}
+
+header .item-content a:hover{
+    color: $green;
+}
+
+header .accordion-item.open>.item-content {
+    overflow: hidden;
+    display: block;
+}
+
+header .accordion-item>.item-title {
+    // display: flex;
+    // align-items: center;
+    color: $white;
+    font-family: $title-font;
+    font-size: $menu-size;
+}
+
+header .accordion-item>.item-title:hover{
+    color: $green; 
+}
+
