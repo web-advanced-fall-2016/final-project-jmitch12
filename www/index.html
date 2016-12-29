@@ -2,31 +2,20 @@
 <html>
 
 <head>
-    <title>STEM BOX</title>
-    <meta charset="UTF-8">
+    <title></title>
+    <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="css/reset.css">
+    <link rel="stylesheet" type="text/css" href="css/jquery.fullPage.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link rel="stylesheet" type="text/css" href="css/accordion.css">
 </head>
 
 <body>
-    <!-- <nav class="mobile">
-        <button>Menu</button>
-        <div>
-            <a href="about.html">ABOUT</a>
-            <a href="products.html">PRODUCTS</a>
-            <a href="plants.html">CLASSROOM</a>
-            <a href="tips.html">TIPS</a>
+    <header>
+        <div id="logo">
+            <a href="index.html"><img src="assets/logo.png"></a>
         </div>
-    </nav> -->
-
-    <body background="assets/science.png">
-        <header>
-            <div id="logo">
-                <a href="index.html"><img src="assets/logo.png"></a>
-            </div>
-            <nav>
-                   <!-- div class="menu-item">
+        <nav>
+            <!-- div class="menu-item">
                 <div class="accordion">
                     <div class="accordion-item">
                         <div class="item-title">SCIENCE</div>
@@ -80,7 +69,7 @@
                     </div>
                 </div>
             </div>
-         <!--    <div class="menu-item">
+            <!--    <div class="menu-item">
                 <div class="accordion">
                     <div class="accordion-item">
                         <div class="item-title">ART</div>
@@ -119,11 +108,28 @@
             <!-- <div class="menu-item">
                 <a href="">ABOUT</a>
             </div> -->
-            </nav>
-        </header>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-        <script src="js/jquery.fullPage.min.js"></script>
-        <script src="js/accordion.js"></script>
-    </body>
+        </nav>
+    </header>
+    <div id="fullpage">
+        <div class="section">
+            <div id="game"></div>
+        </div>
+        <div class="description">
+                <h1>Pipeline</h1>
+                <h2>Get the Water Flowing!</h2>
+                <p>Successfully connect the pipes to allow water to flow efficiently through the system</p>
+                <!-- <a href="engineer.html#learn">learn more</a> -->
+            </div>
+        <div class="section"></div>
+        <!-- <div class="section"></div> -->
+    </div>
+    <script src="js/p5.min.js"></script>
+    <!-- <script src="js/p5.play.js"></script> -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/jquery.fullPage.min.js"></script>
+    <script src="js/engineer.js"></script>
+    <script src="js/accordion.js"></script>
+    <script src="js/pipeline.js"></script>
+</body>
 
 </html>

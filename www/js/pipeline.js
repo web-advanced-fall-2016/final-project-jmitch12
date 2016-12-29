@@ -1,3 +1,8 @@
+//ARRAY OF LEVELS
+var levelFiles = ["mapInfo.json", "levelTwo.json"];
+
+var firstRun = true;
+
 //SIZE OF GRID
 var COLUMNS = 18;
 var ROWS = 10;
@@ -18,31 +23,23 @@ var pipes = [];
 //OBSTACLES 2D ARRAY
 var obstacles = [];
 
+//JSON Variables
 var obstaclesList;
-
 var levelName;
-
 var playerMoves = [];
-
 var endX, endY, startX, startY, destinationX, destinationY;
-
 var obstaclesInfo = [];
-
 var pipesRemaining;
-
 var currentLevel = 0;
 
+//ARRAY OF DYNAMIC ITEMS
 var dynamicItems = [];
-
-//ARRAY OF LEVELS
-var levelFiles = ["mapInfo.json", "levelTwo.json"];
-
 
 //BASE TEXT SIZE
 var fontSize = 14;
 
 //IMAGE VARIABLES
-var bg, firstPipe, user, endPipe, gameOver, winner, crack;
+var bg, firstPipe, user, endPipe, gameOver, winner, crack, final;
 
 /*=======LOAD SOUNDS=======*/
 //UNCOMMENT TO PLAY SOUNDS
@@ -97,7 +94,8 @@ function loadLevel(mapInfoFile) {
         endPipe = loadImage("assets/end.png");
         gameOver = loadImage("assets/loser.png");
         winner = loadImage("assets/winnerTwo.png");
-        crack = loadImage("assets/crack.png")
+        crack = loadImage("assets/crack.png");
+        final = loadImage("assets/final.png");
 
         for (i = 0; i < obstaclesInfo.length; i++) {
             obstaclesInfo[i]["img"] = loadImage(obstaclesInfo[i].artwork)
@@ -133,7 +131,14 @@ function preload() {
 
 function setup() {
 
-
+    if (firstRun) {
+        dynamicItems.push({img : loadImage("assets/load.png"), 
+                            x : 0, y : 0 , 
+                            w : canvasWidth, 
+                            h : canvasHeight, 
+                            lifeTime : 300});
+        firstRun = false;
+} 
     var canvas = createCanvas(canvasWidth, canvasHeight);
     canvas.parent('game');
 
@@ -266,7 +271,7 @@ function draw() {
             image(winner, 0, 0, canvasWidth, canvasHeight);
             var levelButton = document.createElement('button');
             levelButton.innerHTML = "Next Level"
-            levelButton.classList.add = "next";
+            levelButton.className = "next";
 
             var canvasPage = document.getElementById('game');
             canvasPage.appendChild(levelButton);
@@ -470,7 +475,11 @@ function reset() {
 function nextLevel() {
     currentLevel++;
     if (currentLevel >= levelFiles.length) {
-        console.log("YOU A WINNER HA-HA-HA")
+        image (final, 0, 0, canvasWidth, canvasHeight);
+        if (mouseIsPressed) {
+                // scream.pause();
+                reset();
+        }
     } else {
         loadLevel(levelFiles[currentLevel]);
     }

@@ -36,10 +36,10 @@ header {
   top: 0;
   width: 100vw;
   height: 100px;
-  z-index: 5; }
+  z-index: 10; }
   header nav {
     float: right;
-    margin: 35px 45px; }
+    margin: 40px 45px; }
     header nav .menu-item {
       display: inline-block; }
       header nav .menu-item a {
@@ -68,11 +68,46 @@ header nav a:hover {
   height: 500px;
   top: 10px;
   margin-left: 45px;
-  padding: 10px; }
+  padding: 15px; }
+
+.description {
+  position: relative;
+  float: right;
+  top: -525px;
+  width: 210px;
+  margin-right: 50px; }
+  .description h1 {
+    font-family: "Oswald", sans-serif;
+    color: white;
+    font-size: 2em;
+    text-transform: uppercase;
+    padding-bottom: 5px; }
+  .description h2 {
+    font-family: "Oswald", sans-serif;
+    color: #88B04B;
+    font-size: 1.25em;
+    padding-bottom: 15px;
+    text-transform: uppercase; }
+  .description p {
+    font-family: "Quattrocento", serif;
+    color: #DFDFE3;
+    font-size: 1em;
+    line-height: 1.15em;
+    padding-bottom: 20px; }
+  .description a {
+    color: #88B04B;
+    text-decoration: none; }
+
+.description a:hover {
+  color: #DFDFE3; }
 
 .next {
+  position: relative;
+  top: -200px;
+  left: 200px;
   color: #4C4B55;
-  background-color: #DFDFE3; }
+  background-color: #DFDFE3;
+  outline: none; }
 
 .next:hover {
   background-color: #84b8e3; }
