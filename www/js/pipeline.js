@@ -1,6 +1,7 @@
 //ARRAY OF LEVELS
 var levelFiles = ["mapInfo.json", "levelTwo.json"];
 
+//ONLY LOAD SCREEN ONCE
 var firstRun = true;
 
 //SIZE OF GRID
@@ -131,6 +132,7 @@ function preload() {
 
 function setup() {
 
+//LOADING SCREEN
     if (firstRun) {
         dynamicItems.push({img : loadImage("assets/load.png"), 
                             x : 0, y : 0 , 
@@ -139,6 +141,8 @@ function setup() {
                             lifeTime : 300});
         firstRun = false;
 } 
+
+    //DRAW CANVAS
     var canvas = createCanvas(canvasWidth, canvasHeight);
     canvas.parent('game');
 
@@ -147,6 +151,7 @@ function setup() {
 
 function draw() {
 
+//RUN if Player has not won already and if map has loaded
     if (!playerWon && mapReady) {
         /*=========START + END==========*/
         background(bg);
