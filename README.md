@@ -4,13 +4,19 @@
 
 Pipeline is the first in a series of educational STEM (Science, Technology, Engineering, and Math) mini-games exploring flow through different systems. 
 
-#### Frontend Focused
+SETUP:
+- Clone or download respository 
+- Open Terminal: navigate to folder, enter -npm install
+- When finished, enter -npm install gulp
+- Finally enter into terminal: -gulp serve
+- Website should appear in browser with game
+
+### Frontend Focused
 
 TOOLS USED: 
 - Libraries = p5.js, fullpage.js, jquery.js
 - Accordion menu created using in class code from Web Advanced: JavaScript
 - All artwork created by Jane Mitchell for the game and website
-- Data visualization, use chart.js/THREE.js/WebGL
 
 NEXT STEPS: 
 - Create more levels for Pipeline
