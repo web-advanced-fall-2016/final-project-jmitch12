@@ -138,7 +138,7 @@ function setup() {
                             x : 0, y : 0 , 
                             w : canvasWidth, 
                             h : canvasHeight, 
-                            lifeTime : 300});
+                            lifeTime : 200});
         firstRun = false;
 } 
 
@@ -313,6 +313,7 @@ function keyPressed() {
 
     if (!collisionDetected) {
         if (keyCode == UP_ARROW) {
+            console.log(getPlayerPosition());
             //If the player isn't at the top of the grid, move it UP.
             if (getPlayerPosition().y > 0) {
                 let nextPos = { x: getPlayerPosition().x, y: getPlayerPosition().y - 1 };
@@ -334,6 +335,7 @@ function keyPressed() {
                 }
             }
         } else if (keyCode == DOWN_ARROW) {
+            console.log(getPlayerPosition());
             //If the player isn't at the bottom of the grid, move it DOWN.
             if (getPlayerPosition().y < ROWS - 1) {
                 let nextPos = { x: getPlayerPosition().x, y: getPlayerPosition().y + 1 };
@@ -355,6 +357,7 @@ function keyPressed() {
                 }
             }
         } else if (keyCode == LEFT_ARROW) {
+            console.log(getPlayerPosition());
             if (getPlayerPosition().x > 0) {
                 let nextPos = { x: getPlayerPosition().x - 1, y: getPlayerPosition().y };
                 if (playerMoves.length > 1 && undoMove(nextPos)) {
@@ -376,6 +379,7 @@ function keyPressed() {
                 }
             }
         } else if (keyCode == RIGHT_ARROW) {
+            console.log(getPlayerPosition());
             if (getPlayerPosition().x < COLUMNS - 1) {
                 let nextPos = { x: getPlayerPosition().x + 1, y: getPlayerPosition().y };
                 if (playerMoves.length > 1 && undoMove(nextPos)) {
@@ -481,10 +485,18 @@ function nextLevel() {
     currentLevel++;
     if (currentLevel >= levelFiles.length) {
         image (final, 0, 0, canvasWidth, canvasHeight);
-        if (mouseIsPressed) {
-                // scream.pause();
-                reset();
-        }
+          var replayButton = document.createElement('button');
+            replayButton.innerHTML = "Replay"
+            replayButton.className = "replay";
+
+            var canvasPage = document.getElementById('game');
+            canvasPage.appendChild(replayButton);
+
+            replayButton.addEventListener("click", function() {
+                replayButton.style.display = 'none';
+                currentLevel = 0;
+                loadLevel(levelFiles[currentLevel]);
+            });
     } else {
         loadLevel(levelFiles[currentLevel]);
     }

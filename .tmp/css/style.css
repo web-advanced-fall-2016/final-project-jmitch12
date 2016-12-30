@@ -103,11 +103,30 @@ header nav a:hover {
 
 .next {
   position: relative;
-  top: -200px;
-  left: 200px;
+  top: -225px;
+  left: 425px;
+  width: 85px;
+  height: 25px;
   color: #4C4B55;
+  text-transform: uppercase;
   background-color: #DFDFE3;
-  outline: none; }
+  outline: none;
+  border: none; }
 
 .next:hover {
+  background-color: #84b8e3; }
+
+.replay {
+  position: relative;
+  top: -180px;
+  left: 425px;
+  width: 85px;
+  height: 25px;
+  color: #4C4B55;
+  text-transform: uppercase;
+  background-color: #DFDFE3;
+  outline: none;
+  border: none; }
+
+.replay:hover {
   background-color: #84b8e3; }

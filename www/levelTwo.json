@@ -6,12 +6,11 @@
 	"obstaclesList" : [{"x":0, "y":1}, {"x":1, "y":1}, {"x":2, "y":1}, 
                 {"x":0, "y":2}, {"x":1, "y":2}, {"x":2, "y":2}, 
                 {"x":0, "y":3}, {"x":1, "y":3}, {"x":2, "y":3},
-                {"x":9, "y":0}, {"x":9, "y":1}, {"x":9, "y":2}, {"x":9, "y":3},
-                {"x":10, "y":0}, {"x":10, "y":1}, {"x":10, "y":2}, {"x":10, "y":3}, 
-                {"x":11, "y":0}, {"x":11, "y":1}, {"x":11, "y":2}, {"x":11, "y":3},
-                {"x":1, "y":7}, {"x":2, "y":7}, {"x":3, "y":7},
-                {"x":1, "y":8}, {"x":2, "y":8}, {"x":3, "y":8},
-                {"x":1, "y":9}, {"x":2, "y":9}, {"x":3, "y":9}],
+                {"x":12, "y":4}, {"x":12, "y":5}, {"x":13, "y":4}, {"x":13, "y":5},
+                {"x":6, "y":7}, {"x":7, "y":7}, {"x":8, "y":7},
+                {"x":6, "y":8}, {"x":7, "y":8}, {"x":8, "y":8},
+                {"x":6, "y":9}, {"x":7, "y":9}, {"x":8, "y":9},
+            	{"x":14, "y":3}],
 
 	"playerMoves" : [{ "x": 3, "y": 1 }],
 
@@ -21,16 +20,21 @@
 
 	"destination" : {"x":16, "y":8},
 
-	"pipesRemaining" : 50,
+	"pipesRemaining" : 35,
 
 	"obstaclesInfo" : [
 						{"name" : "gas", 
-						"coordinates" : {"x": 1, "y": 7}, 
+						"coordinates" : {"x": 6, "y": 7}, 
 						"artwork" : "assets/gas.png",
 						"imageSize" : {"w" : 3, "h" : 3} },
 
+						{"name" : "small_rock", 
+						"coordinates" : {"x": 14, "y": 3}, 
+						"artwork" : "assets/small_rock.png",
+						"imageSize" : {"w" : 1, "h" : 1} },
+
 						{"name" : "rock", 
-						"coordinates" : {"x": 10, "y": 4}, 
+						"coordinates" : {"x": 12, "y": 4}, 
 						"artwork" : "assets/rock.png",
 						"imageSize" : {"w" : 2, "h" : 2}
 					}]

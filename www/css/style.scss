@@ -87,13 +87,34 @@ header nav a:hover {
 
 .next {
     position: relative;
-    top: -200px;
-    left: 200px;
+    top: -225px;
+    left: 425px;
+    width:85px;
+    height:25px;
     color: $grey;
+    text-transform: uppercase;
     background-color: $white;
     outline: none;
+    border: none;
 }
 
 .next:hover {
+    background-color: $water-color;
+}
+
+.replay {
+    position: relative;
+    top: -180px;
+    left: 425px;
+    width:85px;
+    height:25px;
+    color: $grey;
+    text-transform: uppercase;
+    background-color: $white;
+    outline: none;
+    border: none;
+}
+
+.replay:hover {
     background-color: $water-color;
 }
