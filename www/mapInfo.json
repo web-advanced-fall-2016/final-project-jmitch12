@@ -21,7 +21,7 @@
 
 	"destination" : {"x":16, "y":8},
 
-	"pipesRemaining" : 35,
+	"pipesRemaining" : 25,
 
 	"obstaclesInfo" : [{"name" : "root", 
 						"coordinates" : {"x": 9, "y": 0}, 

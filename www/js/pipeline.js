@@ -262,10 +262,28 @@ function draw() {
             // scream.play();
 
             image(gameOver, 0, 0, canvasWidth, canvasHeight);
+
             if (mouseIsPressed) {
-                // scream.pause();
                 reset();
             }
+
+            // var retryButton = document.createElement('button');
+            // retryButton.innerHTML = "Try Again"
+            // retryButton.className = "replay";
+
+            // var canvasPage = document.getElementById('game');
+            // canvasPage.appendChild(retryButton);
+
+            // pipesRemaining = data.pipesRemaining;
+            // // mapReady = false;
+
+            // retryButton.addEventListener("click", function() {
+            //     retryButton.style.display = 'none';
+            //     currentLevel = 0;
+            //     loadLevel(levelFiles[currentLevel]);
+            // });
+
+
         }
 
         /*=========PLAYER REACHES END PIPE = WINNER=================*/
