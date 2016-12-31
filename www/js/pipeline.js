@@ -55,6 +55,8 @@ var interval = 20;
 
 var mapReady = false;
 
+/*=======LOAD CURRENT LEVEL MAP========*/
+
 function loadLevel(mapInfoFile) {
     mapReady = false;
     playerWon = false;
@@ -266,24 +268,6 @@ function draw() {
             if (mouseIsPressed) {
                 reset();
             }
-
-            // var retryButton = document.createElement('button');
-            // retryButton.innerHTML = "Try Again"
-            // retryButton.className = "replay";
-
-            // var canvasPage = document.getElementById('game');
-            // canvasPage.appendChild(retryButton);
-
-            // pipesRemaining = data.pipesRemaining;
-            // // mapReady = false;
-
-            // retryButton.addEventListener("click", function() {
-            //     retryButton.style.display = 'none';
-            //     currentLevel = 0;
-            //     loadLevel(levelFiles[currentLevel]);
-            // });
-
-
         }
 
         /*=========PLAYER REACHES END PIPE = WINNER=================*/
@@ -315,6 +299,7 @@ function draw() {
 /*=========TRACKING PLAYER MOVES/POSITION==========*/
 
 const getPlayerPosition = (index) => {
+    //INDEXING THE PLAYER POSITION
     let ind = index ? index + 1 : 1;
     return playerMoves[playerMoves.length - ind];
 };
@@ -327,11 +312,14 @@ const undoMove = (nextPos) => {
 /*=========MOVE PLAYER==========*/
 
 function keyPressed() {
+
+    //ESTABLISH THE COLLISION DETECTION FUNCTION WHEN THE PLAYER IS MOVING
     var collisionDetected = detectCollisions(keyCode);
 
+    //DO THE FOLLOWING IF COLLISION IS NOT DETECTED
     if (!collisionDetected) {
         if (keyCode == UP_ARROW) {
-            console.log(getPlayerPosition());
+            
             //If the player isn't at the top of the grid, move it UP.
             if (getPlayerPosition().y > 0) {
                 let nextPos = { x: getPlayerPosition().x, y: getPlayerPosition().y - 1 };
@@ -353,7 +341,7 @@ function keyPressed() {
                 }
             }
         } else if (keyCode == DOWN_ARROW) {
-            console.log(getPlayerPosition());
+            
             //If the player isn't at the bottom of the grid, move it DOWN.
             if (getPlayerPosition().y < ROWS - 1) {
                 let nextPos = { x: getPlayerPosition().x, y: getPlayerPosition().y + 1 };
@@ -375,7 +363,7 @@ function keyPressed() {
                 }
             }
         } else if (keyCode == LEFT_ARROW) {
-            console.log(getPlayerPosition());
+            //IF PLAYER IS NOT AT THE FAR LEFT OF THE GRID, MOVE PLAYER LEFT
             if (getPlayerPosition().x > 0) {
                 let nextPos = { x: getPlayerPosition().x - 1, y: getPlayerPosition().y };
                 if (playerMoves.length > 1 && undoMove(nextPos)) {
@@ -397,7 +385,7 @@ function keyPressed() {
                 }
             }
         } else if (keyCode == RIGHT_ARROW) {
-            console.log(getPlayerPosition());
+            //IF PLAYER IS NOT AT THE FAR RIGHT OF THE GRID, MOVE PLAYER RIGHT
             if (getPlayerPosition().x < COLUMNS - 1) {
                 let nextPos = { x: getPlayerPosition().x + 1, y: getPlayerPosition().y };
                 if (playerMoves.length > 1 && undoMove(nextPos)) {
@@ -421,6 +409,7 @@ function keyPressed() {
 
     } else {
             console.log("Boom");
+            //DISPLAY 'CRACK' WHEN COLLISION DETECTED 
             dynamicItems.push({ img : crack, x : getPlayerPosition().x * cellSize, 
                                         y : getPlayerPosition().y * cellSize, w : cellSize * 2, h : cellSize * 2, lifeTime : 100});
     }
@@ -499,6 +488,7 @@ function reset() {
 
 }
 
+/*=======MOVE TO NEXT LEVEL========*/
 function nextLevel() {
     currentLevel++;
     if (currentLevel >= levelFiles.length) {
