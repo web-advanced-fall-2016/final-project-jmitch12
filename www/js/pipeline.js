@@ -25,7 +25,6 @@ var pipes = [];
 var obstacles = [];
 
 //JSON Variables
-var obstaclesList;
 var levelName;
 var playerMoves = [];
 var endX, endY, startX, startY, destinationX, destinationY;
@@ -66,9 +65,6 @@ function loadLevel(mapInfoFile) {
     /*======CONNECT TO JSON FILE=======*/
     $.getJSON(mapInfoFile, function(data) {
 
-        //OBSTACLE POSITIONS
-        obstaclesList = data.obstaclesList;
-
         //ARRAY OF MOVES 
         playerMoves = data.playerMoves;
 
@@ -77,11 +73,22 @@ function loadLevel(mapInfoFile) {
         endY = data.end.y * cellSize;
 
         //STARTING PIPE POSITION
-        startX = data.start.x * cellSize;
-        startY = data.start.y * cellSize;
+        // startX = data.start.x * cellSize;
+        // startY = data.start.y * cellSize;
 
         //INFORMATION FOR ALL DIFFERENT OBSTACLES
         obstaclesInfo = data.obstaclesInfo;
+
+        //OBSTACLE POSITIONS
+        for (var i = 0; i < obstaclesInfo.length; i++){
+            var coordinateX = obstaclesInfo[i].coordinates.x;
+            var coordinateY = obstaclesInfo[i].coordinates.y;
+            for (var j = 0; j < obstaclesInfo[i].relativeShape.length; j++){
+                var relativeX = obstaclesInfo[i].relativeShape[j].x;
+                var relativeY = obstaclesInfo[i].relativeShape[j].y;
+                obstacles.push({x: coordinateX + relativeX , y: coordinateY + relativeY});
+            }
+        }
 
         //Number of pipes left
         pipesRemaining = data.pipesRemaining;
@@ -92,7 +99,7 @@ function loadLevel(mapInfoFile) {
 
         /*=======LOAD IMAGES=======*/
         bg = loadImage("assets/background.png");
-        firstPipe = loadImage("assets/begin.png");
+        // firstPipe = loadImage("assets/begin.png");
         user = loadImage("assets/user.png");
         endPipe = loadImage("assets/end.png");
         gameOver = loadImage("assets/loser.png");
@@ -157,7 +164,7 @@ function draw() {
     if (!playerWon && mapReady) {
         /*=========START + END==========*/
         background(bg);
-        image(firstPipe, startX, startY, cellSize * 3, cellSize * 3);
+        // image(firstPipe, startX, startY, cellSize * 3, cellSize * 3);
         image(endPipe, endX, endY, cellSize, cellSize * 2);
 
         //OBSTACLE POSITIONS
