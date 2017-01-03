@@ -24,7 +24,11 @@ var pipes = [];
 //OBSTACLES 2D ARRAY
 var obstacles = [];
 
+//ENEMIES ARRAY 
+var enemies = [];
+
 //JSON Variables
+var obstaclesList = [];
 var levelName;
 var playerMoves = [];
 var endX, endY, startX, startY, destinationX, destinationY;
@@ -52,19 +56,25 @@ var bg, firstPipe, user, endPipe, gameOver, winner, crack, final;
 //TIMER VARIABLE
 var interval = 20;
 
+//TEST IF EVERYTHING HAS LOADED
 var mapReady = false;
+
+//GAME IS READY TO BEGIN (load screen is gone)
+var gameReady = false;
 
 /*=======LOAD CURRENT LEVEL MAP========*/
 
 function loadLevel(mapInfoFile) {
+
     mapReady = false;
     playerWon = false;
 
     setup();
 
+
     /*======CONNECT TO JSON FILE=======*/
     $.getJSON(mapInfoFile, function(data) {
-
+        console.log("loading level");
         //ARRAY OF MOVES 
         playerMoves = data.playerMoves;
 
@@ -80,13 +90,15 @@ function loadLevel(mapInfoFile) {
         obstaclesInfo = data.obstaclesInfo;
 
         //OBSTACLE POSITIONS
-        for (var i = 0; i < obstaclesInfo.length; i++){
+        for (var i = 0; i < obstaclesInfo.length; i++) {
+            console.log("ready to work");
+            console.log(obstaclesInfo[i]);
             var coordinateX = obstaclesInfo[i].coordinates.x;
             var coordinateY = obstaclesInfo[i].coordinates.y;
-            for (var j = 0; j < obstaclesInfo[i].relativeShape.length; j++){
+            for (var j = 0; j < obstaclesInfo[i].relativeShape.length; j++) {
                 var relativeX = obstaclesInfo[i].relativeShape[j].x;
                 var relativeY = obstaclesInfo[i].relativeShape[j].y;
-                obstacles.push({x: coordinateX + relativeX , y: coordinateY + relativeY});
+                obstaclesList.push({ x: coordinateX + relativeX, y: coordinateY + relativeY });
             }
         }
 
@@ -97,23 +109,32 @@ function loadLevel(mapInfoFile) {
         destinationX = data.destination.x;
         destinationY = data.destination.y;
 
+        enemies = data.enemyInfo;
+
         /*=======LOAD IMAGES=======*/
         bg = loadImage("assets/background.png");
-        // firstPipe = loadImage("assets/begin.png");
         user = loadImage("assets/user.png");
         endPipe = loadImage("assets/end.png");
         gameOver = loadImage("assets/loser.png");
         winner = loadImage("assets/winnerTwo.png");
         crack = loadImage("assets/crack.png");
+        brrr = loadImage("assets/frozen.png");
         final = loadImage("assets/final.png");
 
         for (i = 0; i < obstaclesInfo.length; i++) {
-            obstaclesInfo[i]["img"] = loadImage(obstaclesInfo[i].artwork)
+            obstaclesInfo[i]["img"] = loadImage(obstaclesInfo[i].artwork);
+        }
+
+        for (i = 0; i < enemies.length; i++) {
+            enemies[i]["img"] = loadImage(enemies[i].artwork);
+            enemies[i]["currentCoordinates"] = enemies[i].startCoordinates;
+            enemies[i]["currentDirection"] = Math.random();
         }
 
         //UNCOMMENT FOR BACKGROUND SOUNDTRACK
         // track.play();
 
+        //SETUP 2D OBSTACLE AND PIPE ARRAYS
         for (var i = 0; i < COLUMNS; i++) {
             pipes[i] = [];
             obstacles[i] = [];
@@ -141,15 +162,19 @@ function preload() {
 
 function setup() {
 
-//LOADING SCREEN
+    //LOADING SCREEN
     if (firstRun) {
-        dynamicItems.push({img : loadImage("assets/load.png"), 
-                            x : 0, y : 0 , 
-                            w : canvasWidth, 
-                            h : canvasHeight, 
-                            lifeTime : 200});
+        dynamicItems.push({
+            img: loadImage("assets/load.png"),
+            name: "load",
+            x: 0,
+            y: 0,
+            w: canvasWidth,
+            h: canvasHeight,
+            lifeTime: 200
+        });
         firstRun = false;
-} 
+    }
 
     //DRAW CANVAS
     var canvas = createCanvas(canvasWidth, canvasHeight);
@@ -160,7 +185,7 @@ function setup() {
 
 function draw() {
 
-//RUN if Player has not won already and if map has loaded
+    //RUN if Player has not won already and if map has loaded
     if (!playerWon && mapReady) {
         /*=========START + END==========*/
         background(bg);
@@ -217,6 +242,14 @@ function draw() {
         textSize(fontSize);
         text("PRESSURE", 67, 170);
 
+        //DRAWING ENEMIES
+        if (gameReady) {
+            for (var i = 0; i < enemies.length; i++) {
+                drawEnemy(enemies[i]);
+            }
+        }
+
+
         // /*=========TIMER SETUP===========*/
         //    var t = interval-int(millis()/1000);
         //    time = nf(t , 3);
@@ -244,21 +277,25 @@ function draw() {
         //        };
         //    } 
 
-         //DYNAMIC ITEMS (effects, juice, etc.)
+        //DYNAMIC ITEMS (effects, juice, etc.)
         var keepItems = [];
 
-        for (var i = 0; i < dynamicItems.length; i++) {
-            if (dynamicItems[i].lifeTime > 0){
-                image(dynamicItems[i].img, 
-                dynamicItems[i].x, 
-                dynamicItems[i].y, 
-                dynamicItems[i].w,
-                dynamicItems[i].h);
+        if (dynamicItems.length == 0 || dynamicItems[0].name !== "load") {
+            gameReady = true;
+        }
 
-                dynamicItems[i].lifeTime --;
+        for (var i = 0; i < dynamicItems.length; i++) {
+            if (dynamicItems[i].lifeTime > 0) {
+                image(dynamicItems[i].img,
+                    dynamicItems[i].x,
+                    dynamicItems[i].y,
+                    dynamicItems[i].w,
+                    dynamicItems[i].h);
+
+                dynamicItems[i].lifeTime--;
 
                 keepItems.push(dynamicItems[i]);
-            } 
+            }
         }
 
         dynamicItems = keepItems;
@@ -326,7 +363,7 @@ function keyPressed() {
     //DO THE FOLLOWING IF COLLISION IS NOT DETECTED
     if (!collisionDetected) {
         if (keyCode == UP_ARROW) {
-            
+
             //If the player isn't at the top of the grid, move it UP.
             if (getPlayerPosition().y > 0) {
                 let nextPos = { x: getPlayerPosition().x, y: getPlayerPosition().y - 1 };
@@ -348,7 +385,7 @@ function keyPressed() {
                 }
             }
         } else if (keyCode == DOWN_ARROW) {
-            
+
             //If the player isn't at the bottom of the grid, move it DOWN.
             if (getPlayerPosition().y < ROWS - 1) {
                 let nextPos = { x: getPlayerPosition().x, y: getPlayerPosition().y + 1 };
@@ -412,13 +449,19 @@ function keyPressed() {
                     pipesRemaining--;
                 }
             }
-        } 
+        }
 
     } else {
-            console.log("Boom");
-            //DISPLAY 'CRACK' WHEN COLLISION DETECTED 
-            dynamicItems.push({ img : crack, x : getPlayerPosition().x * cellSize, 
-                                        y : getPlayerPosition().y * cellSize, w : cellSize * 2, h : cellSize * 2, lifeTime : 100});
+        //DISPLAY 'CRACK' WHEN COLLISION DETECTED 
+        dynamicItems.push({
+            img: crack,
+            name: "crack",
+            x: getPlayerPosition().x * cellSize,
+            y: getPlayerPosition().y * cellSize,
+            w: cellSize * 2,
+            h: cellSize * 2,
+            lifeTime: 100
+        });
     }
     /* switch(keyCode) {
          case UP_ARROW:
@@ -499,20 +542,130 @@ function reset() {
 function nextLevel() {
     currentLevel++;
     if (currentLevel >= levelFiles.length) {
-        image (final, 0, 0, canvasWidth, canvasHeight);
-          var replayButton = document.createElement('button');
-            replayButton.innerHTML = "Replay"
-            replayButton.className = "replay";
+        image(final, 0, 0, canvasWidth, canvasHeight);
+        var replayButton = document.createElement('button');
+        replayButton.innerHTML = "Replay"
+        replayButton.className = "replay";
 
-            var canvasPage = document.getElementById('game');
-            canvasPage.appendChild(replayButton);
+        var canvasPage = document.getElementById('game');
+        canvasPage.appendChild(replayButton);
 
-            replayButton.addEventListener("click", function() {
-                replayButton.style.display = 'none';
-                currentLevel = 0;
-                loadLevel(levelFiles[currentLevel]);
-            });
+        replayButton.addEventListener("click", function() {
+            replayButton.style.display = 'none';
+            currentLevel = 0;
+            loadLevel(levelFiles[currentLevel]);
+        });
     } else {
         loadLevel(levelFiles[currentLevel]);
     }
+}
+
+/*=======CREATING ENEMIES========*/
+function drawEnemy(enemy) {
+
+    if (Math.round(enemy.currentCoordinates.x) == getPlayerPosition().x &&
+        Math.round(enemy.currentCoordinates.y) == getPlayerPosition().y) {
+        //add sound effect = ahhh
+        pipesRemaining--;
+
+        //MOVE PLAYER BACK A SPACE WHEN HIT BY ENEMY
+        if (pipes[getPlayerPosition().x][getPlayerPosition().y] == "pipe") {
+
+            //DELETE THE PREVIOUS PIPE
+            pipes[getPlayerPosition().x][getPlayerPosition().y] = "empty";
+        }
+
+        //REMOVE LAST MOVE FROM THE ARRAY
+        if (playerMoves.length > 1) {
+            playerMoves.pop();
+        }
+
+
+        dynamicItems.push({
+            img: brrr,
+            name: "frozen",
+            x: getPlayerPosition().x * cellSize,
+            y: getPlayerPosition().y * cellSize,
+            w: cellSize * 2,
+            h: cellSize * 2,
+            lifeTime: 50
+        });
+    }
+
+    image(enemy.img,
+        Math.round(enemy.currentCoordinates.x) * cellSize,
+        Math.round(enemy.currentCoordinates.y) * cellSize,
+        enemy.imageSize.w * cellSize,
+        enemy.imageSize.h * cellSize);
+
+    var currentSpeed = enemy.speed;
+
+    if (Math.random() < enemy.craziness) {
+        enemy.currentDirection = Math.random();
+
+    }
+
+    if (Math.random() < enemy.difficulty) {
+        var playerVector = {
+            x: getPlayerPosition().x - enemy.currentCoordinates.x,
+            y: getPlayerPosition().y - enemy.currentCoordinates.y
+        }
+
+        if (playerVector.x >= 0 && playerVector.y > 0) {
+            enemy.currentDirection = 0.6;
+        } else if (playerVector.x >= 0 && playerVector.y <= 0) {
+            enemy.currentDirection = 0.4;
+        } else if (playerVector.x < 0 && playerVector.y <= 0) {
+            enemy.currentDirection = 0.1;
+        } else if (playerVector.x < 0 && playerVector.y > 0) {
+            enemy.currentDirection = 0.8;
+        }
+    }
+
+
+    var newCoordinates;
+
+    if (enemy.currentDirection <= 0.25) {
+        newCoordinates = {
+            //UP
+            x: enemy.currentCoordinates.x,
+            y: enemy.currentCoordinates.y - 1 * currentSpeed
+        };
+    } else if (enemy.currentDirection > 0.25 && enemy.currentDirection <= 0.50) {
+        newCoordinates = {
+            //RIGHT
+            x: enemy.currentCoordinates.x + 1 * currentSpeed,
+            y: enemy.currentCoordinates.y
+        };
+    } else if (enemy.currentDirection > 0.5 && enemy.currentDirection <= 0.75) {
+        newCoordinates = {
+            //DOWN
+            x: enemy.currentCoordinates.x,
+            y: enemy.currentCoordinates.y + 1 * currentSpeed
+        };
+    } else if (enemy.currentDirection > 0.75 && enemy.currentDirection < 1) {
+        newCoordinates = {
+            //LEFT
+            x: enemy.currentCoordinates.x - 1 * currentSpeed,
+            y: enemy.currentCoordinates.y
+        };
+    }
+
+
+    if (newCoordinates.x > 0 && newCoordinates.x < COLUMNS - 1 &&
+        newCoordinates.y > 0 && newCoordinates.y < ROWS - 1) {
+
+        enemy.currentCoordinates.x = newCoordinates.x;
+        enemy.currentCoordinates.y = newCoordinates.y;
+
+    } else if (newCoordinates.x <= 0) {
+        enemy.currentDirection = 0.4;
+    } else if (newCoordinates.x >= COLUMNS - 1) {
+        enemy.currentDirection = 0.8;
+    } else if (newCoordinates.y <= 0) {
+        enemy.currentDirection = 0.6;
+    } else if (newCoordinates.y >= ROWS - 1) {
+        enemy.currentDirection = 0.1;
+    }
+
 }
