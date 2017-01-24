@@ -17,6 +17,14 @@
 						"imageSize" : {"w" : 1, "h" : 1},
 						"speed": 0.1,
 						"difficulty" : 0.05,
+						"craziness" : 0.05},
+
+						{"name" : "mrFreeze", 
+						"startCoordinates" : {"x": 12, "y": 8}, 
+						"artwork" : "assets/freeze.png",
+						"imageSize" : {"w" : 1, "h" : 1},
+						"speed": 0.1,
+						"difficulty" : 0.05,
 						"craziness" : 0.08},
 
 						{"name" : "mrFreeze", 
